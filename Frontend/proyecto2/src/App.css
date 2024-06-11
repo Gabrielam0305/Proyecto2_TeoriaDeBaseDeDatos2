@@ -1,0 +1,17 @@
+/* Apply background color to the entire page */
+html, body, #root {
+  background-color: black;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Additional styling for your component */
+.general {
+  color: white; /* Ensure the text is visible on a black background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
