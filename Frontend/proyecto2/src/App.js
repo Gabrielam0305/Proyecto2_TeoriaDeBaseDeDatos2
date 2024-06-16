@@ -1,14 +1,10 @@
 import React from "react";
 import "./App.css";
-import Login from "./Screen/login/login"; // Note the capitalization
+import Login from "./Screen/login/login";
+import Info from "./Screen/Info/Info";
 
 function App() {
-  return (
-    <div className="general">
-      <Login />
-    </div>
-  );
+  return <div className="general">{/* <Login /> */ <Info />}</div>;
 }
-oooo;
 
 export default App;

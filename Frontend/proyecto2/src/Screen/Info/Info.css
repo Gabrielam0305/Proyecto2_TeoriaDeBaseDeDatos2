@@ -1,0 +1,24 @@
+.info-container {
+    width: 100%;
+    margin:  10px;
+    justify-content: center;
+    align-items: left;
+  }
+
+  .info-container button {
+    margin: 5px;
+  }
+  
+  .two-column-form {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .form-column {
+    width: 500px;
+    margin-left: 50px;
+
+  }
+  
+  
+  
