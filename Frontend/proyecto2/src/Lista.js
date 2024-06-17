@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
+import axios from "axios";
 
 const Lista = () => {
   const [sinReplicar, setSinReplicar] = useState([
