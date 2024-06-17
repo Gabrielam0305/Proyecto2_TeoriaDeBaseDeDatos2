@@ -240,7 +240,7 @@ app.post("/SQLServer-Postgres", async (req, res) => {
   }
 });
 
-app.get("/VistaSqlServer", async (req, res) => {
+app.post("/VistaSqlServer", async (req, res) => {
   try {
     // Crear una nueva conexión
     const pool = await sql.connect(sqlConfig);
@@ -261,7 +261,7 @@ app.get("/VistaSqlServer", async (req, res) => {
   }
 });
 
-app.get("/VistaPostgres", async (req, res) => {
+app.post("/VistaPostgres", async (req, res) => {
   try {
     // Conectar a la base de datos
     const client = await pgPool.connect();
@@ -283,7 +283,7 @@ app.get("/VistaPostgres", async (req, res) => {
   }
 });
 
-app.get("/test", async (req, res) => {
+app.post("/test", async (req, res) => {
   let a = '{"id":1,"nombre":"salero","edad":39}';
   console.log(jsonToXml(a));
   res.send(a);

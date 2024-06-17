@@ -4,7 +4,8 @@ import axios from "axios";
 
 const Lista = () => {
   const realizarPeticion = async () => {
-    let url = "http://localhost:3000/VistaSql";
+    let urlPostgres = "http://localhost:3000/VistaPostgres";
+    let url = "http://localhost:3000/VistaSqlServer";
 
     const body = {
       nombre: {},
@@ -20,7 +21,7 @@ const Lista = () => {
     try {
       const res = await axios.post(url, body, config);
       const responseData = res.data; // Assuming the response is an array of objects
-
+      console.log("se realizo la peticion");
       // Assuming responseData is an array with one object as in your example
     } catch (error) {
       if (error.response && error.response.data) {
