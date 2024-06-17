@@ -56,3 +56,32 @@ sql
 app.listen(port, () => {
   console.log("Servidor corriendo en el puerto:", port);
 });
+
+function convertirJsonToXml(jsonData) {
+  let xmlString = "<root>";
+  for (const key in jsonData) {
+    if (Object.hasOwnProperty.call(jsonData, key)) {
+      xmlString += `<${key.toUpperCase()}>${
+        jsonData[key]
+      }</${key.toUpperCase()}>`;
+    }
+  }
+  xmlString += "</root>";
+  return xmlString;
+}
+
+function convertirXmlToJson(xmlString) {
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(xmlString, "text/xml");
+  const json = {};
+  const rootElement = xmlDoc.documentElement;
+
+  for (let i = 0; i < rootElement.children.length; i++) {
+    const child = rootElement.children[i];
+    const tagName = child.tagName.toLowerCase();
+    const textContent = child.textContent;
+    json[tagName] = textContent;
+  }
+
+  return json;
+}
