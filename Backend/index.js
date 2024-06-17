@@ -86,10 +86,8 @@ function convertirXmlToJson(xmlString) {
         const tagName = child.tagName && child.tagName.toLowerCase();
 
         if (child.nodeType === 1) {
-          // ELEMENT_NODE
           value[tagName] = xmlNodeToJson(child);
         } else if (child.nodeType === 3 && child.nodeValue.trim()) {
-          // TEXT_NODE
           value = child.nodeValue.trim();
         }
       }
@@ -105,10 +103,8 @@ function convertirXmlToJson(xmlString) {
       const tagName = child.tagName && child.tagName.toLowerCase();
 
       if (child.nodeType === 1) {
-        // ELEMENT_NODE
         json[tagName] = xmlNodeToJson(child);
       } else if (child.nodeType === 3 && child.nodeValue.trim()) {
-        // TEXT_NODE
         json[tagName] = child.nodeValue.trim();
       }
     }
@@ -128,19 +124,15 @@ app.post("/Postgres-SQLServer", async (req, res) => {
 
   let pgClient;
   try {
-    // Obtener una conexión de PostgreSQL
     pgClient = await pgPool.connect();
 
-    // Consultar los datos en PostgreSQL
     const pgQuery = `SELECT * FROM LogTable WHERE Tabla IN (${parametros
       .map((param) => `'${param}'`)
       .join(",")}) AND ReplicateSQLServer = FALSE`;
     const pgResult = await pgClient.query(pgQuery);
 
-    // Conectar a SQL Server
     await sql.connect(sqlConfig);
 
-    // Insertar los datos en SQL Server
     await Promise.all(
       pgResult.rows.map(async (row) => {
         const request = new sql.Request();
@@ -149,7 +141,6 @@ app.post("/Postgres-SQLServer", async (req, res) => {
         VALUES (@Tabla, @Operacion, @Detalles, @ReplicateSQLServer, @ReplicatePostgres, @Timestamp)
       `;
 
-        // Verificar si algún valor es nulo y manejarlo adecuadamente
         await request
           .input("Tabla", sql.VarChar, row.tabla || "")
           .input("Operacion", sql.VarChar, row.operacion || "")
@@ -169,7 +160,6 @@ app.post("/Postgres-SQLServer", async (req, res) => {
       })
     );
 
-    // Actualizar los registros en PostgreSQL
     const pgUpdateQuery = `UPDATE LogTable SET ReplicateSQLServer = TRUE WHERE Tabla IN (${parametros
       .map((param) => `'${param}'`)
       .join(",")}) AND ReplicateSQLServer = FALSE`;
@@ -183,7 +173,6 @@ app.post("/Postgres-SQLServer", async (req, res) => {
         "Ocurrió un error al consultar e insertar los datos en SQL Server.",
     });
   } finally {
-    // Liberar la conexión de PostgreSQL si está disponible
     if (pgClient) {
       pgClient.release();
     }
@@ -202,7 +191,6 @@ app.post("/SQLServer-Postgres", async (req, res) => {
   try {
     const request = new sql.Request();
 
-    // Consultar los datos en SQL Server
     var sqlString = `SELECT * FROM LogTable WHERE Tabla IN (${parametros
       .map((param) => `'${param}'`)
       .join(",")}) AND ReplicatePostgres = 0`;
@@ -242,18 +230,14 @@ app.post("/SQLServer-Postgres", async (req, res) => {
 
 app.post("/VistaSqlServer", async (req, res) => {
   try {
-    // Crear una nueva conexión
     const pool = await sql.connect(sqlConfig);
 
-    // Consulta a la vista para obtener solo los nombres de las tablas
     const result = await pool
       .request()
       .query("select Table_Name from View_AllTables");
 
-    // Obtener solo los nombres de las tablas del resultado
     const tableNames = result.recordset.map((row) => row.Table_Name);
 
-    // Enviar nombres de las tablas como respuesta
     res.json(tableNames);
   } catch (err) {
     console.error("Error al ejecutar la consulta:", err);
@@ -336,12 +320,12 @@ app.post('/probarConexionPostgres', async (req, res) => {
   try {
     const { user, password, host, database, port } = req.body;
 
-    console.log('--- Request Body ---');  // Log the entire request body for debugging
+    console.log('--- Request Body ---');
     console.log(req.body);
     if (!user || !password || !host || !database || !port) {
       throw new Error('Missing required credentials in request body');
     }
-    // Create a connection pool with secure configuration (adjust as needed)
+
     console.log(user);
     const pgPool2 = new Pool({
       user,
