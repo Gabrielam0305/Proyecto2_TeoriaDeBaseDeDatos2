@@ -288,3 +288,37 @@ app.post("/test", async (req, res) => {
   console.log(jsonToXml(a));
   res.send(a);
 });
+
+
+app.post("/lastTimePostgres", async (req, res) => {
+  try {
+    const client = await pgPool.connect();
+    const result = await client.query(`SELECT * FROM LastExecutionView;`);
+    const lastExecution = result.rows[0].last_execution_time.toString();
+    res.send(lastExecution);
+    client.release();
+  } catch (err) {
+    console.error("Error al ejecutar la consulta:", err);
+    res.status(500).send("Error de servidor");
+  }
+});
+
+app.post("/lastTimeSQLServer", async (req, res) => {
+  try {
+    // Crear una nueva conexión
+    const pool = await sql.connect(sqlConfig);
+
+    // Ejecutar la consulta a la vista
+    const result = await pool.request().query("SELECT * FROM LastExecutionView");
+
+    // Obtener el resultado
+    const lastExecution = result.recordset[0].LastExecutionTime.toString();
+
+    // Enviar el resultado como respuesta
+    res.send(lastExecution);
+  } catch (err) {
+    console.error("Error al ejecutar la consulta:", err);
+    res.status(500).send("Error de servidor");
+  }
+});
+
