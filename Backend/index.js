@@ -3,11 +3,13 @@ const { Pool } = require("pg");
 const sql = require("mssql");
 const cors = require("cors");
 const { DOMParser } = require('xmldom');
+const bodyParser = require('body-parser');
 
 const app = express();
 app.use(cors());
 app.options("*", cors());
 const port = 3000;
+app.use(bodyParser.json());
 
 // Configuración para PostgreSQL
 const pgPool = new Pool({
@@ -58,19 +60,18 @@ app.listen(port, () => {
   console.log("Servidor corriendo en el puerto:", port);
 });
 
-function convertirJsonToXml(jsonData) {
-  let xmlString = "<root>";
-  for (const key in jsonData) {
-    if (Object.hasOwnProperty.call(jsonData, key)) {
-      xmlString += `<${key.toUpperCase()}>${
-        jsonData[key]
-      }</${key.toUpperCase()}>`;
-    }
-  }
-  xmlString += "</root>";
-  return xmlString;
-}
 
+function jsonToXml(json) {
+  let xml = '<root>';
+
+  Object.keys(json).forEach(key => {
+    xml += `<${key.toUpperCase()}>${json[key]}</${key.toUpperCase()}>`;
+  });
+
+  xml += '</root>';
+
+  return xml;
+}
 
 function convertirXmlToJson(xmlString) {
   const parser = new DOMParser();
@@ -144,7 +145,7 @@ app.post('/Postgres-SQLServer', async (req, res) => {
       // Verificar si algún valor es nulo y manejarlo adecuadamente
       await request.input('Tabla', sql.VarChar, row.tabla || '')
         .input('Operacion', sql.VarChar, row.operacion || '')
-        .input('Detalles', sql.Text, convertirJsonToXml(row.detalles || '{}'))
+        .input('Detalles', sql.Text, jsonToXml(JSON.parse(row.detalles)))
         .input('ReplicateSQLServer', sql.Bit, row.replicatesqlserver != null ? row.replicatesqlserver : false)
         .input('ReplicatePostgres', sql.Bit, row.replicatepostgres != null ? row.replicatepostgres : false)
         .input('Timestamp', sql.DateTime, row.timestamp || new Date())
@@ -237,4 +238,10 @@ app.get('/VistaPostgres', async (req, res) => {
     console.error('Error al ejecutar la consulta:', err);
     res.status(500).json({ error: 'Error de servidor' });
   }
+});
+
+app.get('/test', async (req, res) => {
+  let a = '{"id":1,"nombre":"salero","edad":39}';
+  console.log(jsonToXml(a));
+  res.send(a);
 });
