@@ -74,13 +74,42 @@ function convertirXmlToJson(xmlString) {
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(xmlString, "text/xml");
   const json = {};
-  const rootElement = xmlDoc.documentElement;
 
-  for (let i = 0; i < rootElement.children.length; i++) {
-    const child = rootElement.children[i];
-    const tagName = child.tagName.toLowerCase();
-    const textContent = child.textContent;
-    json[tagName] = textContent;
+  function xmlNodeToJson(node) {
+    let value = {};
+
+    if (node.hasChildNodes()) {
+      for (let i = 0; i < node.childNodes.length; i++) {
+        const child = node.childNodes[i];
+        const tagName = child.tagName && child.tagName.toLowerCase();
+
+        if (child.nodeType === 1) {
+          // ELEMENT_NODE
+          value[tagName] = xmlNodeToJson(child);
+        } else if (child.nodeType === 3 && child.nodeValue.trim()) {
+          // TEXT_NODE
+          value = child.nodeValue.trim();
+        }
+      }
+    }
+
+    return value;
+  }
+
+  const rootElement = xmlDoc.documentElement;
+  if (rootElement.hasChildNodes()) {
+    for (let i = 0; i < rootElement.childNodes.length; i++) {
+      const child = rootElement.childNodes[i];
+      const tagName = child.tagName && child.tagName.toLowerCase();
+
+      if (child.nodeType === 1) {
+        // ELEMENT_NODE
+        json[tagName] = xmlNodeToJson(child);
+      } else if (child.nodeType === 3 && child.nodeValue.trim()) {
+        // TEXT_NODE
+        json[tagName] = child.nodeValue.trim();
+      }
+    }
   }
 
   return json;

@@ -1,8 +1,14 @@
 import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import "./Info.css"; // Import the CSS file correctly
 
 function Info() {
+  const navigate = useNavigate();
+
+  const handleGuardar = () => {
+    navigate("/Lista");
+  };
   const [instanciaOrigen, setInstanciaOrigen] = useState("");
   const [baseOrigen, setBaseOrigen] = useState("");
   const [puertoOrigen, setPuertoOrigen] = useState("");
@@ -149,7 +155,7 @@ function Info() {
             </Button>
           </div>
         </div>
-        <Button variant="primary" type="submit">
+        <Button variant="primary" type="submit" onClick={handleGuardar}>
           Guardar
         </Button>
       </Form>

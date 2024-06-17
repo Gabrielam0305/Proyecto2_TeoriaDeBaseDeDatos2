@@ -1,8 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import axios from "axios";
 
 const Lista = () => {
+  const realizarPeticion = async () => {
+    let url = "http://localhost:3000/VistaSql";
+
+    const body = {
+      nombre: {},
+    };
+
+    const config = {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Access-Control-Allow-Origin": "*",
+      },
+    };
+
+    try {
+      const res = await axios.post(url, body, config);
+      const responseData = res.data; // Assuming the response is an array of objects
+
+      // Assuming responseData is an array with one object as in your example
+    } catch (error) {
+      if (error.response && error.response.data) {
+        console.log("Error in the request:", error.response.data.descripcion);
+      } else {
+        console.log("Error in the request:", error.message);
+      }
+    }
+  };
+
+  useEffect(() => {
+    realizarPeticion();
+  }, []);
   const [sinReplicar, setSinReplicar] = useState([
     "Item 1",
     "Item 2",
