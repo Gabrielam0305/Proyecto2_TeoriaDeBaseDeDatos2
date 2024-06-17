@@ -322,3 +322,49 @@ app.post("/lastTimeSQLServer", async (req, res) => {
   }
 });
 
+app.post("/probarConexionSQL", async (req, res) => {
+  try {
+
+
+  } catch (err) {
+    console.error("Error al ejecutar la consulta:", err);
+    res.status(500).send("Error de servidor");
+  }
+});
+
+app.post('/probarConexionPostgres', async (req, res) => {
+  try {
+    const { user, password, host, database, port } = req.body;
+
+    console.log('--- Request Body ---');  // Log the entire request body for debugging
+    console.log(req.body);
+    if (!user || !password || !host || !database || !port) {
+      throw new Error('Missing required credentials in request body');
+    }
+    // Create a connection pool with secure configuration (adjust as needed)
+    console.log(user);
+    const pgPool2 = new Pool({
+      user,
+      password,
+      host,
+      database,
+      port,
+      ssl: {
+        rejectUnauthorized: false,
+      },
+    });
+    await pgPool2.connect();
+
+    if (pgPool2.isConnected()) {
+      res.json({ success: true, message: 'Conexión exitosa a la base de datos' });
+    } else {
+      res.json({ success: false, message: 'Error al establecer la conexión' });
+    }
+
+  } catch (error) {
+    console.error('Error al comprobar conexión:', error);
+    res.status(500).json({ success: false, message: 'Error de servidor' });
+  } finally {
+    pgPool2.end();
+  }
+});
