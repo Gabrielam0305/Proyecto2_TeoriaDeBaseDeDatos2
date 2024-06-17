@@ -130,11 +130,25 @@ app.post('/Postgres-SQLServer', async (req, res) => {
     const pgQuery = `SELECT * FROM LogTable WHERE Tabla IN (${parametros.map(param => `'${param}'`).join(',')}) AND ReplicateSQLServer = FALSE`;
     const pgResult = await pgClient.query(pgQuery);
 
+    // Conectar a SQL Server
+    await sql.connect(sqlConfig);
+
     // Insertar los datos en SQL Server
-    const request = new sql.Request();
     await Promise.all(pgResult.rows.map(async (row) => {
-      const sqlString = 'INSERT INTO LogTable (Tabla, Operacion, Detalles, ReplicateSQLServer, ReplicatePostgres, Timestamp) VALUES (@Tabla, @Operacion, @Detalles, @ReplicateSQLServer, @ReplicatePostgres, @Timestamp)';
-      await request.input('Tabla', row.Tabla).input('Operacion', row.Operacion).input('Detalles', convertirJsonToXml(row.Detalles)).input('ReplicateSQLServer', row.ReplicateSQLServer).input('ReplicatePostgres', row.ReplicatePostgres).input('Timestamp', row.Timestamp).query(sqlString);
+      const request = new sql.Request();
+      const sqlString = `
+        INSERT INTO LogTable (Tabla, Operacion, Detalles, ReplicateSQLServer, ReplicatePostgres, Timestamp) 
+        VALUES (@Tabla, @Operacion, @Detalles, @ReplicateSQLServer, @ReplicatePostgres, @Timestamp)
+      `;
+
+      // Verificar si algún valor es nulo y manejarlo adecuadamente
+      await request.input('Tabla', sql.VarChar, row.tabla || '')
+        .input('Operacion', sql.VarChar, row.operacion || '')
+        .input('Detalles', sql.Text, convertirJsonToXml(row.detalles || '{}'))
+        .input('ReplicateSQLServer', sql.Bit, row.replicatesqlserver != null ? row.replicatesqlserver : false)
+        .input('ReplicatePostgres', sql.Bit, row.replicatepostgres != null ? row.replicatepostgres : false)
+        .input('Timestamp', sql.DateTime, row.timestamp || new Date())
+        .query(sqlString);
     }));
 
     // Actualizar los registros en PostgreSQL
@@ -143,7 +157,7 @@ app.post('/Postgres-SQLServer', async (req, res) => {
 
     res.json({ message: 'Datos consultados e insertados en SQL Server.' });
   } catch (err) {
-    console.error(err);
+    console.error('Error al consultar e insertar datos:', err);
     return res.status(500).json({ error: 'Ocurrió un error al consultar e insertar los datos en SQL Server.' });
   } finally {
     // Liberar la conexión de PostgreSQL si está disponible
