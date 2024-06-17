@@ -6,9 +6,6 @@ import "./Info.css"; // Import the CSS file correctly
 function Info() {
   const navigate = useNavigate();
 
-  const handleGuardar = () => {
-    navigate("/Lista");
-  };
   const [instanciaOrigen, setInstanciaOrigen] = useState("");
   const [baseOrigen, setBaseOrigen] = useState("");
   const [puertoOrigen, setPuertoOrigen] = useState("");
@@ -20,6 +17,14 @@ function Info() {
   const [puertoDestino, setPuertoDestino] = useState("");
   const [usuarioDestino, setUsuarioDestino] = useState("");
   const [passwordDestino, setPasswordDestino] = useState("");
+
+  const handleGuardar = () => {
+    if (baseOrigen == "postgres") {
+      navigate("/Lista");
+    } else {
+      navigate("/Lista");
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();

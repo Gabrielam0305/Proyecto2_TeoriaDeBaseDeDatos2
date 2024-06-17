@@ -2,14 +2,13 @@ import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import axios from "axios";
 
-const Lista = () => {
+const Lista = (props) => {
+  // const { Nombre, NomDirector } = props.data;
   const realizarPeticion = async () => {
     let urlPostgres = "http://localhost:3000/VistaPostgres";
     let url = "http://localhost:3000/VistaSqlServer";
 
-    const body = {
-      nombre: {},
-    };
+    const body = {};
 
     const config = {
       headers: {
@@ -22,6 +21,7 @@ const Lista = () => {
       const res = await axios.post(url, body, config);
       const responseData = res.data; // Assuming the response is an array of objects
       console.log("se realizo la peticion");
+      console.log("datos: ", responseData);
       // Assuming responseData is an array with one object as in your example
     } catch (error) {
       if (error.response && error.response.data) {
